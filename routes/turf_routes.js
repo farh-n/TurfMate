@@ -20,7 +20,22 @@ router.post("/",async(req,res)=>{
 //get all turfs
 router.get("/",async(req,res)=>{
     try{
-        const allTurfs=await Turf.find();
+        const {location,amenities,priceperhour}=req.query;
+        let filter={};
+        
+        if(location){
+            filter.location={$regex:location,$options:i};
+        }
+        if(priceperhour){
+            filter.priceperhour={};
+            if(priceperhour.gte) filter.priceperhour.$gte=Number(price.gte);
+            if(priceperhour.lte) filter.priceperhour.$lte=Number(price.lte);
+        }
+        if(amenities){
+            const amenitiesArray=amenities.split(',');
+            filter.amenities={$in:amenitiesArray}
+        }
+        const allTurfs=await Turf.find(filter); 
         res.status(201).json(allTurfs);
     }
     catch(err){
